@@ -1,0 +1,274 @@
+# 前端项目需求文档
+
+## 技术栈
+- **框架**：Vue 3 + TypeScript + Vite
+- **UI 组件库**：Element Plus
+- **样式**：Less（含 CSS Variables 主题体系）
+- **状态管理**：Vuex 4（全模块 TS 类型化）
+- **路由**：Vue Router 4
+- **HTTP**：Axios（封装拦截器 + 类型化响应）
+- **后端**：Node.js（Express / Fastify）+ MySQL
+- **代码规范**：ESLint + Prettier + Husky
+
+---
+
+## TypeScript 强化要求
+
+### 1. 严格模式
+```json
+// tsconfig.json
+{
+  "compilerOptions": {
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true
+  }
+}
+```
+
+### 2. 实体类型定义（types/）
+所有业务实体必须定义接口，禁止使用 `any`：
+
+```typescript
+// types/employee.ts
+export interface Employee {
+  id: number
+  name: string
+  gender: 'male' | 'female'
+  departmentId: number
+  departmentName?: string
+  position: string
+  salary: number
+  entryDate: string        // ISO 8601
+  status: EmployeeStatus
+  avatar?: string
+  email: string
+  phone: string
+  createdAt: string
+  updatedAt: string
+}
+
+export type EmployeeStatus = 'active' | 'inactive' | 'probation'
+
+export type CreateEmployeeDTO = Omit<Employee, 'id' | 'createdAt' | 'updatedAt' | 'departmentName'>
+export type UpdateEmployeeDTO = Partial<CreateEmployeeDTO> & { id: number }
+
+// types/department.ts
+export interface Department {
+  id: number
+  name: string
+  leaderId?: number
+  leaderName?: string
+  parentId?: number
+  children?: Department[]
+  employeeCount?: number
+  createdAt: string
+}
+
+// types/api.ts
+export interface ApiResponse<T = unknown> {
+  code: number
+  message: string
+  data: T
+}
+
+export interface PageResult<T> {
+  list: T[]
+  total: number
+  page: number
+  pageSize: number
+}
+
+export interface PageQuery {
+  page: number
+  pageSize: number
+  keyword?: string
+  [key: string]: unknown
+}
+```
+
+### 3. Vuex 全类型化
+```typescript
+// store/modules/employee.ts
+import type { Employee, PageResult } from '@/types/employee'
+
+export interface EmployeeState {
+  list: Employee[]
+  total: number
+  loading: boolean
+  currentEmployee: Employee | null
+}
+
+// 使用 typed useStore composable，避免 store.commit 裸字符串
+```
+
+### 4. Axios 类型封装
+```typescript
+// utils/request.ts
+import axios, { type AxiosRequestConfig } from 'axios'
+import type { ApiResponse } from '@/types/api'
+
+const request = <T = unknown>(config: AxiosRequestConfig): Promise<T> => {
+  return instance.request<ApiResponse<T>, ApiResponse<T>>(config)
+    .then(res => res.data)
+}
+
+export const get = <T>(url: string, params?: object) =>
+  request<T>({ method: 'GET', url, params })
+
+export const post = <T>(url: string, data?: object) =>
+  request<T>({ method: 'POST', url, data })
+```
+
+### 5. 组件 Props 类型
+```typescript
+// 所有组件使用 defineProps<T>() 泛型语法，不使用运行时声明
+defineProps<{
+  employee: Employee
+  loading?: boolean
+  onSave: (data: UpdateEmployeeDTO) => Promise<void>
+}>()
+```
+
+### 6. 枚举与常量
+```typescript
+// constants/index.ts
+export const GENDER_OPTIONS = [
+  { label: '男', value: 'male' },
+  { label: '女', value: 'female' },
+] as const
+
+export type GenderValue = typeof GENDER_OPTIONS[number]['value']
+```
+
+---
+
+## 前端 UI 设计规范
+
+### 整体风格
+- 设计语言：现代简约商务风，参考 Linear / Notion 风格
+- 主色调：`#4F6AF5`（科技蓝）
+- 成功色：`#18A058`，警告色：`#F0A020`，危险色：`#D03050`
+- 背景：`#F5F7FA`（浅灰页面背景）+ `#FFFFFF`（卡片背景）
+- 支持亮色 / 暗色主题切换（CSS Variables 实现）
+
+### 布局结构
+```
+┌─────────────────────────────────────────┐
+│  侧边栏 (240px)  │  顶部导航 (64px)      │
+│  Logo + 菜单     ├─────────────────────  │
+│  折叠动画        │  面包屑 + 用户头像    │
+│                  │                       │
+│                  │  主内容区             │
+│                  │  (卡片 + 渐入动画)    │
+└─────────────────────────────────────────┘
+```
+
+### 交互动效
+- 页面切换：`fade-slide` 路由过渡动画（100ms ease-out）
+- 表格行 hover：左侧蓝色 3px 边框 + 背景淡蓝过渡
+- 按钮点击：scale(0.97) 微压缩反馈
+- 弹窗：从触发元素缩放展开（`transform-origin` 跟随位置）
+- 骨架屏：数据加载时展示 `el-skeleton`，避免白屏
+
+### 核心页面设计
+
+**员工列表页**
+- 顶部搜索栏：姓名/部门/状态筛选，圆角搜索框
+- 数据表格：斑马纹 + 固定操作列 + 列宽自适应
+- 头像列：圆形头像 + 姓名缩写 fallback
+- 状态徽标：彩色圆点 + 文字标签（`active`=绿，`probation`=橙，`inactive`=灰）
+- 分页：居中，显示总数
+
+**员工表单（新增/编辑）**
+- `el-drawer` 侧滑抽屉，宽度 520px
+- 表单分区：基本信息 / 工作信息 / 联系方式
+- 实时表单校验，字段联动（选择部门后自动带入部门信息）
+- 保存按钮 loading 态防重复提交
+
+**部门管理页**
+- 树形表格展示层级关系
+- 左侧部门树 + 右侧员工列表联动
+- 拖拽排序（可选增强）
+
+**Dashboard 首页**
+- 4 个数据卡片：员工总数 / 部门数 / 本月入职 / 离职率
+- 卡片含图标（`@element-plus/icons-vue`）+ 数字滚动动画
+- 折线图：近 6 个月员工变动趋势（ECharts / Chart.js）
+- 部门人员饼图
+
+### 响应式
+- 断点：`lg(1200px)` / `md(992px)` / `sm(768px)`
+- 侧边栏在 md 以下自动折叠为 icon-only 模式
+- 表格在移动端转为卡片列表布局
+
+---
+
+## 核心业务功能
+
+### 员工管理 CRUD
+| 操作 | 接口 | 说明 |
+|------|------|------|
+| 查询列表 | `GET /api/employees` | 分页 + 筛选 |
+| 查询详情 | `GET /api/employees/:id` | |
+| 新增 | `POST /api/employees` | 表单校验 |
+| 编辑 | `PUT /api/employees/:id` | |
+| 删除 | `DELETE /api/employees/:id` | 二次确认 |
+| 批量删除 | `DELETE /api/employees` | 勾选后操作 |
+
+### 部门管理 CRUD
+同上，支持树形结构的增删改查
+
+### 权限控制
+- 基于 Token（JWT）的路由守卫
+- 按钮级权限指令 `v-permission="'employee:delete'"`
+
+---
+
+## 工程化配置
+
+### 目录结构
+```
+src/
+├── api/          # 接口层（全类型化返回值）
+├── assets/       # 静态资源
+├── components/   # 通用组件
+├── composables/  # Vue 3 组合式函数（useEmployee, useDepartment）
+├── constants/    # 枚举与常量
+├── layouts/      # 布局组件（DefaultLayout, AuthLayout）
+├── router/       # 路由（含路由守卫 + 类型化 meta）
+├── store/        # Vuex 模块（全 TS）
+├── styles/       # 全局样式 + Less 变量 + 主题
+├── types/        # 全局类型定义
+├── utils/        # 工具函数（request, format, validate）
+└── views/        # 页面组件
+```
+
+### 代码质量
+- `ESLint` + `vue-ts` 规则集，CI 阻断不规范提交
+- `Prettier` 统一格式化
+- `Husky` pre-commit 钩子运行 lint + type-check
+- `Vitest` 单元测试覆盖 utils / composables
+
+---
+
+## 后端（Node.js）
+
+- 框架：Express 或 Fastify + TypeScript
+- 数据库：MySQL 8 + `mysql2`
+- 认证：JWT（`jsonwebtoken`）
+- 数据校验：`zod` schema 校验请求体
+- 统一响应格式：`{ code, message, data }`
+- 错误中间件：全局捕获，区分 4xx / 5xx
+- 环境变量：`dotenv`，不硬编码敏感信息
+
+---
+
+## GitHub 展示要点
+- `README.md`：项目截图 + 在线 Demo 链接 + 技术栈徽标
+- 清晰的 commit 历史（feat / fix / refactor 规范）
+- `CHANGELOG.md` 记录版本迭代
+- 部署：Vercel（前端）+ Railway / Render（后端）
