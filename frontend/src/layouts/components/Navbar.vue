@@ -11,8 +11,10 @@
     </div>
     <div class="right">
       <el-tooltip :content="isDark ? '切换亮色' : '切换暗色'" placement="bottom">
-        <el-button text @click="toggleTheme">
-          <el-icon :size="18"><Moon v-if="!isDark" /><Sunny v-else /></el-icon>
+        <el-button text class="theme-btn" @click="toggleTheme">
+          <el-icon :size="18" class="theme-icon" :class="{ rotating: isDark }">
+            <Moon v-if="!isDark" /><Sunny v-else />
+          </el-icon>
         </el-button>
       </el-tooltip>
       <el-dropdown trigger="click" @command="handleCommand">
@@ -88,7 +90,7 @@ async function handleCommand(cmd: string) {
     cursor: pointer;
     padding: @space-xs @space-sm;
     border-radius: @border-radius;
-    transition: @transition-base;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 
     &:hover { background: @bg-page; }
 
@@ -98,5 +100,10 @@ async function handleCommand(cmd: string) {
       font-weight: 500;
     }
   }
+}
+
+.theme-btn .theme-icon {
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  &.rotating { transform: rotate(360deg); }
 }
 </style>

@@ -1,13 +1,13 @@
 <template>
   <div class="dashboard" v-loading="loading">
     <!-- Stats Cards -->
-    <el-row :gutter="20" class="stats-row">
+    <el-row :gutter="20" class="stats-row stagger-fade">
       <el-col v-for="card in statCards" :key="card.key" :xs="24" :sm="12" :lg="6">
         <el-card class="stat-card">
           <div class="stat-inner">
             <div class="stat-info">
               <p class="stat-label">{{ card.label }}</p>
-              <p class="stat-value">{{ card.value }}</p>
+              <p class="stat-value">{{ card.animatedValue }}</p>
               <p class="stat-sub" :class="card.trend > 0 ? 'up' : 'down'">
                 <el-icon><Top v-if="card.trend > 0" /><Bottom v-else /></el-icon>
                 较上月 {{ Math.abs(card.trend) }}%
@@ -46,9 +46,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, onUnmounted } from 'vue'
+import { ref, reactive, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import * as echarts from 'echarts'
 import { dashboardApi, type DashboardStats } from '@/api/dashboard'
+import { useCountUp } from '@/composables/useCountUp'
 
 const loading = ref(true)
 const stats = reactive<DashboardStats>({
@@ -64,11 +65,16 @@ const pieChartRef = ref<HTMLDivElement>()
 let lineChart: echarts.ECharts | null = null
 let pieChart: echarts.ECharts | null = null
 
+const countUpTotal = useCountUp(1000)
+const countUpDept = useCountUp(800)
+const countUpEntry = useCountUp(900)
+const countUpRate = useCountUp(700)
+
 const statCards = ref([
-  { key: 'total', label: '员工总数', value: 0, trend: 5.2, icon: 'User', color: '#4F6AF5' },
-  { key: 'dept', label: '部门数量', value: 0, trend: 0, icon: 'OfficeBuilding', color: '#18A058' },
-  { key: 'entry', label: '本月入职', value: 0, trend: 50, icon: 'UserFilled', color: '#F0A020' },
-  { key: 'resign', label: '离职率', value: '0%', trend: -2, icon: 'TrendCharts', color: '#D03050' },
+  { key: 'total', label: '员工总数', value: 0, animatedValue: computed(() => countUpTotal.display.value), trend: 5.2, icon: 'User', color: '#4F6AF5' },
+  { key: 'dept', label: '部门数量', value: 0, animatedValue: computed(() => countUpDept.display.value), trend: 0, icon: 'OfficeBuilding', color: '#18A058' },
+  { key: 'entry', label: '本月入职', value: 0, animatedValue: computed(() => countUpEntry.display.value), trend: 50, icon: 'UserFilled', color: '#F0A020' },
+  { key: 'resign', label: '离职率', value: '0%', animatedValue: computed(() => countUpRate.display.value + '%'), trend: -2, icon: 'TrendCharts', color: '#D03050' },
 ])
 
 const months = ['1月', '2月', '3月', '4月', '5月', '6月']
@@ -77,6 +83,8 @@ function initLineChart() {
   if (!lineChartRef.value) return
   lineChart = echarts.init(lineChartRef.value)
   lineChart.setOption({
+    animationDuration: 1500,
+    animationEasing: 'cubicInOut' as const,
     tooltip: { trigger: 'axis' },
     legend: { data: ['入职', '离职'], bottom: 0 },
     grid: { left: 16, right: 16, bottom: 40, top: 16, containLabel: true },
@@ -109,11 +117,20 @@ function initPieChart() {
   if (!pieChartRef.value) return
   pieChart = echarts.init(pieChartRef.value)
   pieChart.setOption({
+    animationDuration: 1200,
+    animationEasing: 'cubicInOut' as const,
     tooltip: { trigger: 'item', formatter: '{b}: {c}人 ({d}%)' },
-    legend: { orient: 'vertical', left: 'left', textStyle: { fontSize: 12 } },
+    legend: { bottom: 0, textStyle: { fontSize: 12, color: '#718096' } },
     series: [{
-      type: 'pie', radius: ['40%', '70%'],
+      type: 'pie',
+      radius: ['45%', '75%'],
+      center: ['50%', '45%'],
+      avoidLabelOverlap: true,
       itemStyle: { borderRadius: 6, borderColor: '#fff', borderWidth: 2 },
+      label: { show: false },
+      emphasis: {
+        label: { show: true, fontSize: 14, fontWeight: 'bold' }
+      },
       data: [
         { value: 5, name: '技术部', itemStyle: { color: '#4F6AF5' } },
         { value: 3, name: '产品部', itemStyle: { color: '#18A058' } },
@@ -143,6 +160,12 @@ async function fetchStats() {
     statCards.value[1].value = data.departmentCount
     statCards.value[2].value = data.monthlyHires
     statCards.value[3].value = data.turnoverRate + '%'
+
+    await nextTick()
+    countUpTotal.animate(data.totalEmployees)
+    countUpDept.animate(data.departmentCount)
+    countUpEntry.animate(data.monthlyHires)
+    countUpRate.animate(data.turnoverRate)
   } finally {
     loading.value = false
   }

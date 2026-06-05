@@ -84,6 +84,13 @@ async function handleLogin() {
   align-items: center;
   justify-content: center;
   background: linear-gradient(135deg, #667eea 0%, @primary 50%, #764ba2 100%);
+  background-size: 400% 400%;
+  animation: bg-shift 12s ease infinite;
+}
+
+@keyframes bg-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50%      { background-position: 100% 50%; }
 }
 
 .login-card {
@@ -92,6 +99,7 @@ async function handleLogin() {
   border-radius: @border-radius-lg * 2;
   padding: @space-xl * 1.5;
   box-shadow: @shadow-lg;
+  animation: slide-down 0.55s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .login-header {
@@ -102,6 +110,7 @@ async function handleLogin() {
     font-size: 48px;
     color: @primary;
     margin-bottom: @space-md;
+    animation: scale-in 0.5s 0.15s cubic-bezier(0.22, 1, 0.36, 1) both;
   }
 
   h1 {
@@ -109,13 +118,21 @@ async function handleLogin() {
     font-weight: 700;
     color: @text-primary;
     margin-bottom: @space-xs;
+    animation: fade-up 0.5s 0.25s cubic-bezier(0.22, 1, 0.36, 1) both;
   }
 
   p {
     color: @text-secondary;
     font-size: @font-size-sm;
     letter-spacing: 1px;
+    animation: fade-up 0.5s 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
   }
+}
+
+:deep(.el-form-item) {
+  &:nth-child(1) { animation: fade-up 0.5s 0.35s cubic-bezier(0.22, 1, 0.36, 1) both; }
+  &:nth-child(2) { animation: fade-up 0.5s 0.42s cubic-bezier(0.22, 1, 0.36, 1) both; }
+  &:nth-child(3) { animation: fade-up 0.5s 0.49s cubic-bezier(0.22, 1, 0.36, 1) both; }
 }
 
 .login-btn {
@@ -124,6 +141,11 @@ async function handleLogin() {
   font-size: @font-size-md;
   letter-spacing: 4px;
   border-radius: @border-radius;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  &:hover {
+    box-shadow: 0 6px 20px rgba(79, 106, 245, 0.35);
+    transform: translateY(-1px);
+  }
 }
 
 .hint {
@@ -131,5 +153,6 @@ async function handleLogin() {
   color: @text-placeholder;
   font-size: @font-size-xs;
   margin-top: @space-md;
+  animation: fade-up 0.5s 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 </style>

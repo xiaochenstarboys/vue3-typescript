@@ -4,17 +4,44 @@
   box-sizing: border-box;
 }
 
-html, body {
+:root {
+  --font-family-base: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  --font-size-base: 14px;
+}
+
+html, body, #app {
   height: 100%;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', sans-serif;
-  font-size: @font-size-base;
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-base);
   color: @text-primary;
   background: @bg-page;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.4s ease, color 0.4s ease;
 }
 
-#app {
-  height: 100%;
+// Force Segoe UI on all Element Plus components
+.el-menu,
+.el-table,
+.el-button,
+.el-input__inner,
+.el-select,
+.el-form-item__label,
+.el-dialog,
+.el-drawer,
+.el-card,
+.el-pagination,
+.el-breadcrumb,
+.el-dropdown,
+.el-tag,
+.el-tree {
+  font-family: var(--font-family-base) !important;
+}
+
+// Number optimization
+h1, h2, h3, h4, h5, h6,
+.stat-value, .salary {
+  letter-spacing: -0.01em;
 }
 
 a {
@@ -36,42 +63,101 @@ a {
   &:hover { background: @text-placeholder; }
 }
 
-// Route transition
-.fade-slide-enter-active,
+// =============================================
+// Route transitions — slow, corporate feel
+// =============================================
+.fade-slide-enter-active {
+  transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
 .fade-slide-leave-active {
-  transition: opacity 0.15s ease, transform 0.15s ease;
+  transition: all 0.2s cubic-bezier(0.4, 0, 1, 1);
 }
 .fade-slide-enter-from {
   opacity: 0;
-  transform: translateX(8px);
+  transform: translateY(14px) scale(0.985);
 }
 .fade-slide-leave-to {
   opacity: 0;
-  transform: translateX(-8px);
+  transform: translateY(-8px);
 }
 
-// Element Plus overrides
+// =============================================
+// Entrance animations
+// =============================================
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes slide-down {
+  from { opacity: 0; transform: translateY(-24px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.94); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+// Utility: staggered fade-up — elements hold space, just fade
+.stagger-fade > * {
+  animation: fade-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.stagger-fade > *:nth-child(1)  { animation-delay: 0.04s; }
+.stagger-fade > *:nth-child(2)  { animation-delay: 0.10s; }
+.stagger-fade > *:nth-child(3)  { animation-delay: 0.16s; }
+.stagger-fade > *:nth-child(4)  { animation-delay: 0.22s; }
+.stagger-fade > *:nth-child(5)  { animation-delay: 0.28s; }
+.stagger-fade > *:nth-child(6)  { animation-delay: 0.34s; }
+
+// =============================================
+// Element Plus overrides — corporate polish
+// =============================================
 .el-button {
-  transition: @transition-base;
-  &:active { transform: scale(0.97); }
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  &:active { transform: scale(0.96); }
+  &:hover {
+    filter: brightness(1.06);
+  }
 }
 
 .el-card {
   border: 1px solid @border-color;
   border-radius: @border-radius-lg;
   box-shadow: @shadow-sm;
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+              box-shadow 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow, 0 6px 20px rgba(0,0,0,0.1));
+  }
 }
 
 .el-table {
   .el-table__row {
-    transition: @transition-base;
+    transition: background-color 0.2s ease;
     &:hover > td {
       background: var(--table-hover-bg, #f0f4ff) !important;
     }
   }
 }
 
+// Input focus glow
+.el-input__wrapper {
+  transition: box-shadow 0.25s ease, background-color 0.25s ease;
+}
+.el-input.is-focus .el-input__wrapper {
+  box-shadow: 0 0 0 1px var(--primary, #4F6AF5) inset,
+              0 0 0 3px rgba(79, 106, 245, 0.12);
+}
+
+// Pagination polish
+.el-pagination button,
+.el-pagination .el-pager li {
+  transition: all 0.2s ease;
+}
+
+// =============================================
 // Status badge colors
+// =============================================
 .status-badge {
   display: inline-flex;
   align-items: center;
@@ -90,4 +176,18 @@ a {
   &.active   { background: #e8f7ee; color: @success; .dot { background: @success; } }
   &.probation { background: #fff7e6; color: @warning; .dot { background: @warning; } }
   &.inactive { background: #f5f5f5; color: @info;    .dot { background: @info;    } }
+}
+
+// =============================================
+// Skeleton shimmer
+// =============================================
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.skeleton {
+  background: linear-gradient(90deg, var(--border-color, #E2E8F0) 25%, transparent 50%, var(--border-color, #E2E8F0) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.6s infinite;
+  border-radius: 4px;
 }

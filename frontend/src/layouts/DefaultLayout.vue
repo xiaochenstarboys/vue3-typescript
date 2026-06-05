@@ -9,8 +9,8 @@
       </header>
       <main class="content">
         <router-view v-slot="{ Component, route }">
-          <transition name="fade-slide" mode="out-in">
-            <component :is="Component" :key="route.path" />
+          <transition name="fade-slide" mode="out-in" appear>
+            <component :is="Component" :key="route.fullPath" />
           </transition>
         </router-view>
       </main>
@@ -37,7 +37,6 @@ const isCollapsed = ref(false)
 .sidebar {
   width: @sidebar-width;
   flex-shrink: 0;
-  transition: width 0.3s ease;
   overflow: hidden;
 
   &.collapsed {
