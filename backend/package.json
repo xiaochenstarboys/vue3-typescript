@@ -1,7 +1,7 @@
 {
-  "name": "hr-system-backend",
+  "name": "company-management-backend",
   "version": "1.0.0",
-  "description": "HR Management System Backend - Node.js + Express + TypeScript + MySQL",
+  "description": "Company Management System Backend - Node.js + Express + TypeScript + MySQL",
   "main": "dist/app.js",
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/app.ts",

@@ -1,7 +1,7 @@
 {
-  "name": "hr-system-frontend",
+  "name": "company-management-frontend",
   "version": "1.0.0",
-  "description": "HR Management System Frontend - Vue3 + TypeScript + Vite + Element Plus",
+  "description": "Company Management System Frontend - Vue3 + TypeScript + Vite + Element Plus",
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc && vite build",

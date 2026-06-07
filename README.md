@@ -1,4 +1,4 @@
-# HR 管理系统
+# 公司管理项目
 
 > Vue 3 + TypeScript + Vite + Element Plus + Node.js Express + MySQL
 

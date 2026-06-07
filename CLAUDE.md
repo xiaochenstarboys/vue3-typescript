@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## 项目概述
 
-HR 管理系统 — Vue 3 + TS + Vite + Element Plus 前端，Express + TS + MySQL 后端。
+公司管理项目 — Vue 3 + TS + Vite + Element Plus 前端，Express + TS + MySQL 后端。
 
 ## 常用命令
 
