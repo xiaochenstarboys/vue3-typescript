@@ -4,7 +4,8 @@ import { pool } from '../config/db'
 import { asyncHandler } from '../middleware/asyncHandler'
 import { authMiddleware } from '../middleware/auth'
 import { toCamelCase } from '../utils/toCamelCase'
-import { PageQuery } from '../types'
+import { PageQuery, type DbRow } from '../types'
+import type { ResultSetHeader } from 'mysql2'
 
 const router = Router()
 router.use(authMiddleware)
@@ -42,13 +43,13 @@ router.get('/', asyncHandler(async (req: Request, res: Response) => {
   }
 
   const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : ''
-  const [countRows] = await pool.query<any[]>(
+  const [countRows] = await pool.query<DbRow[]>(
     `SELECT COUNT(*) as total FROM employees e ${where}`,
     params
   )
   const total = countRows[0].total
 
-  const [rows] = await pool.query<any[]>(
+  const [rows] = await pool.query<DbRow[]>(
     `SELECT e.*, d.name as department_name
      FROM employees e
      LEFT JOIN departments d ON e.department_id = d.id
@@ -60,7 +61,7 @@ router.get('/', asyncHandler(async (req: Request, res: Response) => {
 }))
 
 router.get('/:id', asyncHandler(async (req: Request, res: Response) => {
-  const [rows] = await pool.query<any[]>(
+  const [rows] = await pool.query<DbRow[]>(
     `SELECT e.*, d.name as department_name FROM employees e
      LEFT JOIN departments d ON e.department_id = d.id WHERE e.id = ?`,
     [req.params.id]
@@ -76,7 +77,7 @@ router.post('/', asyncHandler(async (req: Request, res: Response) => {
     return
   }
   const d = parsed.data
-  const [result] = await pool.query<any>(
+  const [result] = await pool.query<ResultSetHeader>(
     `INSERT INTO employees (name, gender, department_id, position, salary, entry_date, status, email, phone, avatar)
      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [d.name, d.gender, d.departmentId, d.position, d.salary, d.entryDate, d.status, d.email, d.phone, d.avatar ?? null]

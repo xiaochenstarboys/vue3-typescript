@@ -1,11 +1,22 @@
 <template>
   <div class="login-page">
+    <!-- 背景装饰 -->
+    <div class="bg-decoration">
+      <div class="orb orb-1" />
+      <div class="orb orb-2" />
+      <div class="orb orb-3" />
+    </div>
+
+    <!-- 卡片 -->
     <div class="login-card">
-      <div class="login-header">
-        <el-icon class="header-icon"><OfficeBuilding /></el-icon>
-        <h1>HR 管理系统</h1>
-        <p>Human Resource Management</p>
+      <div class="card-header">
+        <div class="logo-icon">
+          <el-icon :size="28"><OfficeBuilding /></el-icon>
+        </div>
+        <h1 class="title">HR 管理系统</h1>
+        <p class="subtitle">企业人力资源管理平台</p>
       </div>
+
       <el-form
         ref="formRef"
         :model="form"
@@ -16,7 +27,7 @@
         <el-form-item prop="username">
           <el-input
             v-model="form.username"
-            placeholder="用户名"
+            placeholder="请输入用户名"
             :prefix-icon="User"
             clearable
           />
@@ -25,7 +36,7 @@
           <el-input
             v-model="form.password"
             type="password"
-            placeholder="密码"
+            placeholder="请输入密码"
             :prefix-icon="Lock"
             show-password
           />
@@ -35,13 +46,17 @@
             type="primary"
             class="login-btn"
             :loading="loading"
+            size="large"
             @click="handleLogin"
           >
-            登 录
+            <span v-if="!loading">登 录</span>
           </el-button>
         </el-form-item>
       </el-form>
-      <p class="hint">测试账号：admin / password</p>
+
+      <p class="hint">
+        演示账号 admin · 密码 password
+      </p>
     </div>
   </div>
 </template>
@@ -57,9 +72,7 @@ const router = useRouter()
 const store = useStore()
 const formRef = ref<FormInstance>()
 const loading = ref(false)
-
 const form = reactive({ username: '', password: '' })
-
 const rules: FormRules = {
   username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
   password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
@@ -83,68 +96,135 @@ async function handleLogin() {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #667eea 0%, @primary 50%, #764ba2 100%);
-  background-size: 400% 400%;
-  animation: bg-shift 12s ease infinite;
+  background: @bg-page;
+  position: relative;
+  overflow: hidden;
 }
 
-@keyframes bg-shift {
-  0%, 100% { background-position: 0% 50%; }
-  50%      { background-position: 100% 50%; }
+// 背景光晕
+.bg-decoration {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
 }
 
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.12;
+  animation: orb-drift 12s ease-in-out infinite;
+}
+
+.orb-1 {
+  width: 500px;
+  height: 500px;
+  background: @primary;
+  top: -15%;
+  left: -10%;
+  animation-delay: 0s;
+}
+
+.orb-2 {
+  width: 400px;
+  height: 400px;
+  background: @accent;
+  bottom: -10%;
+  right: -8%;
+  animation-delay: -4s;
+}
+
+.orb-3 {
+  width: 300px;
+  height: 300px;
+  background: @primary-light;
+  top: 50%;
+  left: 55%;
+  animation-delay: -8s;
+  opacity: 0.08;
+}
+
+@keyframes orb-drift {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(30px, -20px) scale(1.05); }
+  66% { transform: translate(-15px, 15px) scale(0.95); }
+}
+
+// 卡片
 .login-card {
   width: 420px;
-  background: @bg-card;
-  border-radius: @border-radius-lg * 2;
-  padding: @space-xl * 1.5;
+  background: @bg-card-raised;
+  border: 1px solid @border-color;
+  border-radius: 20px;
+  padding: 44px 40px;
   box-shadow: @shadow-lg;
-  animation: slide-down 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+  position: relative;
+  z-index: 1;
+  backdrop-filter: blur(20px);
+  animation: card-in 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.login-header {
+@keyframes card-in {
+  from { opacity: 0; transform: translateY(20px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.card-header {
   text-align: center;
   margin-bottom: @space-xl;
 
-  .header-icon {
-    font-size: 48px;
-    color: @primary;
-    margin-bottom: @space-md;
-    animation: scale-in 0.5s 0.15s cubic-bezier(0.22, 1, 0.36, 1) both;
+  .logo-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, @primary, @accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    margin: 0 auto @space-md;
+    box-shadow: 0 8px 24px rgba(var(--primary-rgb), 0.3);
   }
 
-  h1 {
-    font-size: @font-size-xl;
-    font-weight: 700;
+  .title {
+    font-size: 26px;
+    font-weight: @font-weight-extrabold;
     color: @text-primary;
-    margin-bottom: @space-xs;
-    animation: fade-up 0.5s 0.25s cubic-bezier(0.22, 1, 0.36, 1) both;
+    margin: 0 0 @space-xs;
+    letter-spacing: 0.02em;
   }
 
-  p {
+  .subtitle {
     color: @text-secondary;
     font-size: @font-size-sm;
-    letter-spacing: 1px;
-    animation: fade-up 0.5s 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+    margin: 0;
   }
 }
 
+// 表单动画
 :deep(.el-form-item) {
-  &:nth-child(1) { animation: fade-up 0.5s 0.35s cubic-bezier(0.22, 1, 0.36, 1) both; }
-  &:nth-child(2) { animation: fade-up 0.5s 0.42s cubic-bezier(0.22, 1, 0.36, 1) both; }
-  &:nth-child(3) { animation: fade-up 0.5s 0.49s cubic-bezier(0.22, 1, 0.36, 1) both; }
+  &:nth-child(1) { animation: fade-up 0.4s 0.15s cubic-bezier(0.4, 0, 0.2, 1) both; }
+  &:nth-child(2) { animation: fade-up 0.4s 0.22s cubic-bezier(0.4, 0, 0.2, 1) both; }
+  &:nth-child(3) { animation: fade-up 0.4s 0.29s cubic-bezier(0.4, 0, 0.2, 1) both; }
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .login-btn {
   width: 100%;
-  height: 46px;
+  height: 48px;
   font-size: @font-size-md;
-  letter-spacing: 4px;
+  font-weight: @font-weight-bold;
+  letter-spacing: 8px;
   border-radius: @border-radius;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  &:hover {
-    box-shadow: 0 6px 20px rgba(79, 106, 245, 0.35);
-    transform: translateY(-1px);
+  transition: all 0.2s ease;
+
+  &:not(:disabled):active {
+    transform: scale(0.98);
   }
 }
 
@@ -152,7 +232,16 @@ async function handleLogin() {
   text-align: center;
   color: @text-placeholder;
   font-size: @font-size-xs;
-  margin-top: @space-md;
-  animation: fade-up 0.5s 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+  margin: @space-md 0 0;
+  line-height: 1.5;
+  opacity: 0.7;
+}
+
+// 响应式
+@media (max-width: 480px) {
+  .login-card {
+    width: 92%;
+    padding: 32px 24px;
+  }
 }
 </style>

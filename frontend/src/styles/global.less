@@ -1,12 +1,8 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
 :root {
-  --font-family-base: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
-  --font-size-base: 14px;
+  --font-family-base: 'PingFang SC', 'Microsoft YaHei', 'Hiragino Sans GB', sans-serif;
+  --font-size-base: 15px;
 }
 
 html, body, #app {
@@ -17,176 +13,159 @@ html, body, #app {
   background: @bg-page;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  transition: background-color 0.4s ease, color 0.4s ease;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  line-height: @line-height-normal;
 }
 
-// Force Segoe UI on all Element Plus components
-.el-menu,
-.el-table,
-.el-button,
-.el-input__inner,
-.el-select,
-.el-form-item__label,
-.el-dialog,
-.el-drawer,
-.el-card,
-.el-pagination,
-.el-breadcrumb,
-.el-dropdown,
-.el-tag,
-.el-tree {
+// =============================================
+// Element Plus — unified overrides
+// =============================================
+.el-menu, .el-table, .el-button, .el-input__inner, .el-select,
+.el-form-item__label, .el-dialog, .el-drawer, .el-card,
+.el-pagination, .el-breadcrumb, .el-dropdown, .el-tag, .el-tree {
   font-family: var(--font-family-base) !important;
 }
 
-// Number optimization
-h1, h2, h3, h4, h5, h6,
-.stat-value, .salary {
-  letter-spacing: -0.01em;
-}
-
-a {
-  color: @primary;
-  text-decoration: none;
-}
+a { color: @primary; text-decoration: none; transition: color 0.2s ease; }
+a:hover { color: @primary-light; }
 
 // Scrollbar
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-::-webkit-scrollbar-thumb {
-  background: @border-color;
-  border-radius: 3px;
-  &:hover { background: @text-placeholder; }
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: @border-color; border-radius: 3px; border: 1px solid transparent; background-clip: content-box; }
+::-webkit-scrollbar-thumb:hover { background: @text-placeholder; border-radius: 3px; }
+
+// Route transitions
+.fade-slide-enter-active { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+.fade-slide-leave-active { transition: all 0.2s ease; position: absolute; }
+.fade-slide-enter-from { opacity: 0; transform: translateY(16px); }
+.fade-slide-leave-to { opacity: 0; transform: translateY(-8px); }
+
+// Animations
+@keyframes fade-up { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes slide-down { from { opacity: 0; transform: translateY(-16px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes scale-in { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+
+.stagger-fade > * { animation: fade-up 0.4s cubic-bezier(0.4, 0, 0.2, 1) both; }
+.stagger-fade > *:nth-child(1) { animation-delay: 0.03s; }
+.stagger-fade > *:nth-child(2) { animation-delay: 0.08s; }
+.stagger-fade > *:nth-child(3) { animation-delay: 0.13s; }
+.stagger-fade > *:nth-child(4) { animation-delay: 0.18s; }
+
+// =============================================
+// Buttons
+// =============================================
+.el-button { border-radius: @border-radius; transition: @transition-base; }
+.el-button:active { transform: scale(0.97); }
+.el-button--primary {
+  --el-button-bg-color: var(--primary);
+  --el-button-border-color: var(--primary);
+  --el-button-hover-bg-color: var(--primary-dark);
+  --el-button-hover-border-color: var(--primary-dark);
 }
 
 // =============================================
-// Route transitions — slow, corporate feel
+// Cards
 // =============================================
-.fade-slide-enter-active {
-  transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
-}
-.fade-slide-leave-active {
-  transition: all 0.2s cubic-bezier(0.4, 0, 1, 1);
-}
-.fade-slide-enter-from {
-  opacity: 0;
-  transform: translateY(14px) scale(0.985);
-}
-.fade-slide-leave-to {
-  opacity: 0;
-  transform: translateY(-8px);
-}
-
-// =============================================
-// Entrance animations
-// =============================================
-@keyframes fade-up {
-  from { opacity: 0; transform: translateY(18px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-@keyframes slide-down {
-  from { opacity: 0; transform: translateY(-24px) scale(0.97); }
-  to   { opacity: 1; transform: translateY(0) scale(1); }
-}
-@keyframes scale-in {
-  from { opacity: 0; transform: scale(0.94); }
-  to   { opacity: 1; transform: scale(1); }
-}
-
-// Utility: staggered fade-up — elements hold space, just fade
-.stagger-fade > * {
-  animation: fade-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-.stagger-fade > *:nth-child(1)  { animation-delay: 0.04s; }
-.stagger-fade > *:nth-child(2)  { animation-delay: 0.10s; }
-.stagger-fade > *:nth-child(3)  { animation-delay: 0.16s; }
-.stagger-fade > *:nth-child(4)  { animation-delay: 0.22s; }
-.stagger-fade > *:nth-child(5)  { animation-delay: 0.28s; }
-.stagger-fade > *:nth-child(6)  { animation-delay: 0.34s; }
-
-// =============================================
-// Element Plus overrides — corporate polish
-// =============================================
-.el-button {
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  &:active { transform: scale(0.96); }
-  &:hover {
-    filter: brightness(1.06);
-  }
-}
-
 .el-card {
+  background: @bg-card;
   border: 1px solid @border-color;
-  border-radius: @border-radius-lg;
+  border-radius: @border-radius-xl;
   box-shadow: @shadow-sm;
-  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
-              box-shadow 0.3s cubic-bezier(0.22, 1, 0.36, 1);
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow, 0 6px 20px rgba(0,0,0,0.1));
-  }
+  transition: box-shadow 0.25s ease, border-color 0.25s ease;
 }
-
-.el-table {
-  .el-table__row {
-    transition: background-color 0.2s ease;
-    &:hover > td {
-      background: var(--table-hover-bg, #f0f4ff) !important;
-    }
-  }
-}
-
-// Input focus glow
-.el-input__wrapper {
-  transition: box-shadow 0.25s ease, background-color 0.25s ease;
-}
-.el-input.is-focus .el-input__wrapper {
-  box-shadow: 0 0 0 1px var(--primary, #4F6AF5) inset,
-              0 0 0 3px rgba(79, 106, 245, 0.12);
-}
-
-// Pagination polish
-.el-pagination button,
-.el-pagination .el-pager li {
-  transition: all 0.2s ease;
+.el-card:hover {
+  border-color: rgba(var(--primary-rgb), 0.18);
+  box-shadow: @shadow;
 }
 
 // =============================================
-// Status badge colors
+// Tables
+// =============================================
+.el-table {
+  border-radius: @border-radius-lg;
+  overflow: hidden;
+  --el-table-border-color: var(--border-color) !important;
+}
+.el-table .el-table__header th {
+  background: var(--table-header-bg) !important;
+  font-weight: @font-weight-semibold;
+  font-size: @font-size-sm;
+  color: @text-secondary;
+  letter-spacing: 0.03em;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border-color) !important;
+}
+.el-table .el-table__body td {
+  font-size: @font-size-base;
+  padding: 16px 0;
+}
+.el-table .el-table__row:hover > td {
+  background: var(--table-hover-bg) !important;
+}
+
+// =============================================
+// Inputs
+// =============================================
+.el-input__wrapper { border-radius: @border-radius !important; transition: @transition-base; }
+.el-input.is-focus .el-input__wrapper,
+.el-select .el-input.is-focus .el-input__wrapper {
+  box-shadow: 0 0 0 1px var(--primary) inset, 0 0 0 3px rgba(var(--primary-rgb), 0.12);
+}
+
+// =============================================
+// Pagination
+// =============================================
+.el-pagination .el-pager li { border-radius: @border-radius-sm !important; transition: @transition-base; }
+.el-pagination .el-pager li.is-active { background: var(--primary) !important; color: #fff !important; }
+
+// =============================================
+// Dialog & Drawer
+// =============================================
+.el-dialog { border-radius: @border-radius-xl !important; }
+.el-drawer { border-radius: @border-radius-xl 0 0 @border-radius-xl; }
+
+// =============================================
+// Sidebar menu
+// =============================================
+.el-menu { border-right: none !important; }
+.el-menu-item {
+  margin: 3px 10px !important;
+  border-radius: @border-radius !important;
+  height: 44px !important;
+  transition: @transition-base !important;
+}
+.el-menu-item:hover { background: var(--bg-sidebar-hover) !important; }
+.el-menu-item.is-active {
+  background: rgba(var(--primary-rgb), 0.15) !important;
+  color: var(--primary) !important;
+}
+
+// =============================================
+// Status badges
 // =============================================
 .status-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  font-size: @font-size-xs;
-  font-weight: 500;
-  padding: 2px 8px;
-  border-radius: 20px;
-
-  .dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-  }
-
-  &.active   { background: #e8f7ee; color: @success; .dot { background: @success; } }
-  &.probation { background: #fff7e6; color: @warning; .dot { background: @warning; } }
-  &.inactive { background: #f5f5f5; color: @info;    .dot { background: @info;    } }
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: @font-size-xs; font-weight: @font-weight-medium;
+  padding: 3px 12px; border-radius: 12px;
 }
+.status-badge .dot { width: 6px; height: 6px; border-radius: 50%; }
+.status-badge.active    { background: rgba(var(--success-rgb), 0.1); color: @success; }
+.status-badge.active    .dot { background: @success; }
+.status-badge.probation { background: rgba(var(--warning-rgb), 0.1); color: @warning; }
+.status-badge.probation .dot { background: @warning; }
+.status-badge.inactive  { background: rgba(var(--danger-rgb), 0.08); color: @danger; }
+.status-badge.inactive  .dot { background: @danger; }
 
 // =============================================
-// Skeleton shimmer
+// Skeleton
 // =============================================
 @keyframes shimmer {
-  0%   { background-position: -200% 0; }
+  0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
 }
 .skeleton {
-  background: linear-gradient(90deg, var(--border-color, #E2E8F0) 25%, transparent 50%, var(--border-color, #E2E8F0) 75%);
+  background: linear-gradient(90deg, var(--skeleton-base) 25%, var(--skeleton-shine) 50%, var(--skeleton-base) 75%);
   background-size: 200% 100%;
   animation: shimmer 1.6s infinite;
   border-radius: 4px;

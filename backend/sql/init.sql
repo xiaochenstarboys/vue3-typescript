@@ -42,23 +42,22 @@ CREATE TABLE IF NOT EXISTS employees (
   FOREIGN KEY (department_id) REFERENCES departments(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Seed: departments
+-- Seed: departments (2=技术部,3=产品部,4=市场部,5=人事部,6=前端组,7=后端组,8=测试组)
 INSERT INTO departments (id, name, parent_id) VALUES
-(1, '总裁办', NULL),
-(2, '技术部', 1),
-(3, '产品部', 1),
-(4, '市场部', 1),
-(5, '人事部', 1),
+(2, '技术部', NULL),
+(3, '产品部', NULL),
+(4, '市场部', NULL),
+(5, '人事部', NULL),
 (6, '前端组', 2),
 (7, '后端组', 2),
 (8, '测试组', 2);
 
--- Seed: admin user (password: admin123)
+-- Seed: admin user (password: password)
 INSERT INTO users (username, password, role) VALUES
 ('admin', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin'),
 ('manager', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'manager');
 
--- Seed: employees
+-- Seed: employees (dept IDs: 2=技术部,3=产品部,4=市场部,5=人事部,6=前端组,7=后端组,8=测试组)
 INSERT INTO employees (name, gender, department_id, position, salary, entry_date, status, email, phone) VALUES
 ('张伟', 'male', 6, '高级前端工程师', 22000, '2022-03-15', 'active', 'zhangwei@example.com', '13800001001'),
 ('李娜', 'female', 6, '前端工程师', 15000, '2023-06-01', 'active', 'lina@example.com', '13800001002'),

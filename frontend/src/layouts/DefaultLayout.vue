@@ -22,7 +22,6 @@
 import { ref } from 'vue'
 import SidebarComp from './components/Sidebar.vue'
 import NavbarComp from './components/Navbar.vue'
-
 const isCollapsed = ref(false)
 </script>
 
@@ -38,10 +37,10 @@ const isCollapsed = ref(false)
   width: @sidebar-width;
   flex-shrink: 0;
   overflow: hidden;
-
-  &.collapsed {
-    width: @sidebar-collapsed-width;
-  }
+  border-right: 1px solid var(--border-light);
+  transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 20;
+  &.collapsed { width: @sidebar-collapsed-width; }
 }
 
 .main-wrapper {
@@ -56,12 +55,12 @@ const isCollapsed = ref(false)
   flex-shrink: 0;
   background: @bg-card;
   border-bottom: 1px solid @border-color;
-  box-shadow: @shadow-sm;
+  z-index: 10;
 }
 
 .content {
   flex: 1;
   overflow-y: auto;
-  padding: @space-lg;
+  padding: @space-lg @space-xl;
 }
 </style>

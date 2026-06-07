@@ -3,32 +3,25 @@
     :model-value="visible"
     @update:model-value="$emit('update:visible', $event)"
     :title="isEdit ? '编辑部门' : '新增部门'"
-    width="480px"
+    width="440px"
     destroy-on-close
+    class="dept-dialog"
   >
-    <el-form
-      ref="formRef"
-      :model="form"
-      :rules="rules"
-      label-width="80px"
-    >
+    <el-form ref="formRef" :model="form" :rules="rules" label-width="80px" class="dept-form">
       <el-form-item label="部门名称" prop="name">
         <el-input v-model="form.name" placeholder="请输入部门名称" />
       </el-form-item>
       <el-form-item label="上级部门">
-        <el-select v-model="form.parentId" placeholder="顶级部门（不选）" clearable style="width: 100%">
-          <el-option
-            v-for="d in availableParents"
-            :key="d.id"
-            :label="d.name"
-            :value="d.id"
-          />
+        <el-select v-model="form.parentId" placeholder="顶级部门（可不选）" clearable style="width: 100%">
+          <el-option v-for="d in availableParents" :key="d.id" :label="d.name" :value="d.id" />
         </el-select>
       </el-form-item>
     </el-form>
     <template #footer>
-      <el-button @click="$emit('update:visible', false)">取消</el-button>
-      <el-button type="primary" :loading="submitting" @click="handleSubmit">确认</el-button>
+      <div class="dialog-footer">
+        <el-button @click="$emit('update:visible', false)">取消</el-button>
+        <el-button type="primary" :loading="submitting" @click="handleSubmit">确认</el-button>
+      </div>
     </template>
   </el-dialog>
 </template>
@@ -56,10 +49,8 @@ const emit = defineEmits<{
 const formRef = ref<FormInstance>()
 const submitting = ref(false)
 const isEdit = computed(() => !!props.department)
-
 const form = reactive<CreateDepartmentDTO>({ name: '', parentId: null })
 
-// Exclude self and descendants when editing to prevent circular reference
 const availableParents = computed(() =>
   isEdit.value
     ? props.deptFlat.filter((d) => d.id !== props.department?.id)
@@ -72,6 +63,7 @@ watch(
     if (val) {
       form.name = props.department?.name ?? ''
       form.parentId = props.department?.parentId ?? null
+      formRef.value?.clearValidate()
     }
   }
 )
@@ -81,7 +73,7 @@ const rules: FormRules = {
 }
 
 async function handleSubmit() {
-  await formRef.value?.validate()
+  await formRef.value?.validate().catch(() => {})
   submitting.value = true
   try {
     if (isEdit.value && props.department) {
@@ -98,3 +90,15 @@ async function handleSubmit() {
   }
 }
 </script>
+
+<style lang="less" scoped>
+.dept-form {
+  padding: @space-sm 0;
+}
+
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: @space-sm;
+}
+</style>

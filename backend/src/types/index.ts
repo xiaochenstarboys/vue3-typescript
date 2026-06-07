@@ -1,3 +1,10 @@
+import type { RowDataPacket } from 'mysql2'
+
+/** MySQL SELECT 查询返回的原始行类型（snake_case 列名） */
+export interface DbRow extends RowDataPacket {
+  [column: string]: unknown
+}
+
 export interface ApiResponse<T = unknown> {
   code: number
   message: string

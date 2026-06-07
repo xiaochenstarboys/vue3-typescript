@@ -1,5 +1,5 @@
 <template>
-  <el-avatar :size="size" :src="avatar" :style="avatarStyle">
+  <el-avatar :size="size" :src="avatar" :style="avatarStyle" class="user-avatar">
     {{ initials }}
   </el-avatar>
 </template>
@@ -13,13 +13,22 @@ const props = defineProps<{
   size?: number
 }>()
 
-const colors = ['#4F6AF5', '#18A058', '#F0A020', '#D03050', '#7B94FF', '#409EFF']
-
 const initials = computed(() => props.name?.charAt(0).toUpperCase() ?? '?')
 
 const avatarStyle = computed(() => {
   if (props.avatar) return {}
-  const index = (props.name?.charCodeAt(0) ?? 0) % colors.length
-  return { background: colors[index], color: '#fff', fontSize: `${(props.size ?? 36) * 0.4}px` }
+  return { background: 'var(--primary)', color: '#fff', fontSize: `${(props.size ?? 36) * 0.4}px`, fontWeight: 600 }
 })
 </script>
+
+<style lang="less" scoped>
+.user-avatar {
+  flex-shrink: 0;
+  box-shadow: var(--avatar-shadow);
+  transition: box-shadow 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 3px 12px rgba(var(--primary-rgb), 0.18);
+  }
+}
+</style>

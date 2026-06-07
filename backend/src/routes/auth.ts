@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken'
 import { z } from 'zod'
 import { pool } from '../config/db'
 import { asyncHandler } from '../middleware/asyncHandler'
+import type { DbRow } from '../types'
 
 const router = Router()
 
@@ -19,9 +20,9 @@ router.post('/login', asyncHandler(async (req: Request, res: Response) => {
     return
   }
   const { username, password } = parsed.data
-  const [rows] = await pool.query<Record<string, unknown>[]>('SELECT * FROM users WHERE username = ?', [username])
+  const [rows] = await pool.query<DbRow[]>('SELECT * FROM users WHERE username = ?', [username])
   const user = rows[0]
-  if (!user || !(await bcrypt.compare(password, user.password))) {
+  if (!user || !(await bcrypt.compare(password, user.password as string))) {
     res.status(401).json({ code: 401, message: '用户名或密码错误', data: null })
     return
   }

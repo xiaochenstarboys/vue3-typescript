@@ -1,4 +1,4 @@
-import { ref, watch } from 'vue'
+import { ref } from 'vue'
 
 export function useCountUp(duration = 1000) {
   const display = ref(0)

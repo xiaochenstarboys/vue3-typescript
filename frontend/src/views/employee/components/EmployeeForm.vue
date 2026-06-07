@@ -2,45 +2,39 @@
   <el-drawer
     :model-value="visible"
     @update:model-value="$emit('update:visible', $event)"
-    :title="isEdit ? '编辑员工' : '新增员工'"
+    :title="isEdit ? '编辑员工信息' : '新增员工'"
     size="520px"
     destroy-on-close
+    class="emp-drawer"
   >
-    <el-form
-      ref="formRef"
-      :model="form"
-      :rules="rules"
-      label-width="88px"
-      label-position="right"
-    >
+    <el-form ref="formRef" :model="form" :rules="rules" label-width="88px" label-position="right">
       <!-- 基本信息 -->
-      <div class="form-section">
-        <p class="section-title">基本信息</p>
+      <fieldset class="form-section">
+        <legend class="section-title">
+          <el-icon :size="14"><User /></el-icon> 基本信息
+        </legend>
         <el-form-item label="姓名" prop="name">
           <el-input v-model="form.name" placeholder="请输入姓名" />
         </el-form-item>
         <el-form-item label="性别" prop="gender">
           <el-radio-group v-model="form.gender">
-            <el-radio value="male">男</el-radio>
-            <el-radio value="female">女</el-radio>
+            <el-radio-button value="male">男</el-radio-button>
+            <el-radio-button value="female">女</el-radio-button>
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="头像链接">
-          <el-input v-model="form.avatar" placeholder="可选，图片 URL" />
+        <el-form-item label="头像">
+          <el-input v-model="form.avatar" placeholder="图片 URL（可选）" />
         </el-form-item>
-      </div>
+      </fieldset>
 
       <!-- 工作信息 -->
-      <div class="form-section">
-        <p class="section-title">工作信息</p>
+      <fieldset class="form-section">
+        <legend class="section-title">
+          <el-icon :size="14"><Briefcase /></el-icon> 工作信息
+        </legend>
         <el-form-item label="部门" prop="departmentId">
           <el-select v-model="form.departmentId" placeholder="选择部门" style="width: 100%">
-            <el-option
-              v-for="d in deptFlat"
-              :key="d.id"
-              :label="d.name"
-              :value="d.id"
-            />
+            <el-option v-for="d in deptFlat" :key="d.id" :label="d.name" :value="d.id" />
           </el-select>
         </el-form-item>
         <el-form-item label="职位" prop="position">
@@ -73,18 +67,20 @@
             <el-option label="离职" value="inactive" />
           </el-select>
         </el-form-item>
-      </div>
+      </fieldset>
 
       <!-- 联系方式 -->
-      <div class="form-section">
-        <p class="section-title">联系方式</p>
+      <fieldset class="form-section">
+        <legend class="section-title">
+          <el-icon :size="14"><Phone /></el-icon> 联系方式
+        </legend>
         <el-form-item label="邮箱" prop="email">
           <el-input v-model="form.email" placeholder="example@company.com" />
         </el-form-item>
         <el-form-item label="手机号" prop="phone">
           <el-input v-model="form.phone" placeholder="1xxxxxxxxxx" />
         </el-form-item>
-      </div>
+      </fieldset>
     </el-form>
 
     <template #footer>
@@ -102,6 +98,7 @@ import type { FormInstance, FormRules } from 'element-plus'
 import type { Employee, CreateEmployeeDTO } from '@/types/employee'
 import { employeeApi } from '@/api/employee'
 import { ElMessage } from 'element-plus'
+import { User, Briefcase, Phone } from '@element-plus/icons-vue'
 
 interface DeptOption { id: number; name: string; parentId?: number | null }
 
@@ -140,7 +137,6 @@ watch(
   (val) => {
     if (val) {
       if (props.employee) {
-        // entryDate from API is ISO format, extract YYYY-MM-DD for the picker
         const dateStr = props.employee.entryDate?.slice(0, 10) ?? ''
         Object.assign(form, {
           name: props.employee.name,
@@ -157,6 +153,7 @@ watch(
       } else {
         Object.assign(form, defaultForm())
       }
+      formRef.value?.clearValidate()
     }
   }
 )
@@ -180,7 +177,7 @@ const rules: FormRules = {
 }
 
 async function handleSubmit() {
-  await formRef.value?.validate()
+  await formRef.value?.validate().catch(() => {})
   submitting.value = true
   try {
     const payload = { ...form }
@@ -201,18 +198,34 @@ async function handleSubmit() {
 </script>
 
 <style lang="less" scoped>
+// 表单分区
 .form-section {
-  margin-bottom: @space-lg;
+  border: none;
+  padding: 0;
+  margin: 0 0 @space-lg;
 
   .section-title {
+    display: flex;
+    align-items: center;
+    gap: 6px;
     font-size: @font-size-sm;
-    font-weight: 600;
-    color: @text-secondary;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+    font-weight: @font-weight-semibold;
+    color: @primary;
     margin-bottom: @space-md;
     padding-bottom: @space-xs;
-    border-bottom: 1px solid @border-color;
+    border-bottom: 2px solid rgba(var(--primary-rgb), 0.12);
+    width: 100%;
   }
+}
+
+// 亮色模式 drawer 头部
+[data-theme="light"] :deep(.el-drawer__header) {
+  border-bottom: 1px solid @border-color;
+  margin-bottom: 0;
+  padding: @space-md @space-xl;
+}
+
+:deep(.el-drawer__body) {
+  padding: @space-md @space-xl;
 }
 </style>

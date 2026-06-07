@@ -4,6 +4,8 @@ import { pool } from '../config/db'
 import { asyncHandler } from '../middleware/asyncHandler'
 import { toCamelCase } from '../utils/toCamelCase'
 import { authMiddleware } from '../middleware/auth'
+import type { DbRow } from '../types'
+import type { ResultSetHeader } from 'mysql2'
 
 const router = Router()
 router.use(authMiddleware)
@@ -14,14 +16,14 @@ const deptSchema = z.object({
   parentId: z.number().int().positive().nullable().optional(),
 })
 
-function buildTree(list: any[], parentId: number | null = null): any[] {
+function buildTree(list: DbRow[], parentId: number | null = null): DbRow[] {
   return list
     .filter((d) => d.parent_id === parentId)
-    .map((d) => ({ ...d, children: buildTree(list, d.id) }))
+    .map((d) => ({ ...d, children: buildTree(list, d.id as number) }))
 }
 
 router.get('/', asyncHandler(async (_req: Request, res: Response) => {
-  const [rows] = await pool.query<any[]>(
+  const [rows] = await pool.query<DbRow[]>(
     `SELECT d.*, e.name as leader_name,
       (SELECT COUNT(*) FROM employees WHERE department_id = d.id) as employee_count
      FROM departments d
@@ -32,12 +34,12 @@ router.get('/', asyncHandler(async (_req: Request, res: Response) => {
 }))
 
 router.get('/flat', asyncHandler(async (_req: Request, res: Response) => {
-  const [rows] = await pool.query<any[]>('SELECT id, name, parent_id FROM departments ORDER BY id')
+  const [rows] = await pool.query<DbRow[]>('SELECT id, name, parent_id FROM departments ORDER BY id')
   res.json({ code: 200, message: 'ok', data: toCamelCase(rows) })
 }))
 
 router.get('/:id', asyncHandler(async (req: Request, res: Response) => {
-  const [rows] = await pool.query<any[]>('SELECT * FROM departments WHERE id = ?', [req.params.id])
+  const [rows] = await pool.query<DbRow[]>('SELECT * FROM departments WHERE id = ?', [req.params.id])
   if (!rows[0]) { res.status(404).json({ code: 404, message: '部门不存在', data: null }); return }
   res.json({ code: 200, message: 'ok', data: toCamelCase(rows[0]) })
 }))
@@ -48,7 +50,7 @@ router.post('/', asyncHandler(async (req: Request, res: Response) => {
     res.status(400).json({ code: 400, message: parsed.error.errors[0].message, data: null }); return
   }
   const d = parsed.data
-  const [result] = await pool.query<any>(
+  const [result] = await pool.query<ResultSetHeader>(
     'INSERT INTO departments (name, leader_id, parent_id) VALUES (?, ?, ?)',
     [d.name, d.leaderId ?? null, d.parentId ?? null]
   )
@@ -73,10 +75,10 @@ router.put('/:id', asyncHandler(async (req: Request, res: Response) => {
 }))
 
 router.delete('/:id', asyncHandler(async (req: Request, res: Response) => {
-  const [rows] = await pool.query<any[]>(
+  const [rows] = await pool.query<DbRow[]>(
     'SELECT COUNT(*) as cnt FROM employees WHERE department_id = ?', [req.params.id]
   )
-  if (rows[0].cnt > 0) {
+  if (Number(rows[0].cnt) > 0) {
     res.status(400).json({ code: 400, message: '该部门下有员工，无法删除', data: null }); return
   }
   await pool.query('DELETE FROM departments WHERE id = ?', [req.params.id])

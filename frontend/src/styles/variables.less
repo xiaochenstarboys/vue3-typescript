@@ -1,65 +1,79 @@
-// Color palette
-@primary: var(--primary, #4F6AF5);
-@primary-light: var(--primary-light, #7B94FF);
-@primary-dark: var(--primary-dark, #3A52D4);
+// =============================================
+// Design Tokens — Modern Warm Slate
+// =============================================
 
-@success: var(--success, #18A058);
-@warning: var(--warning, #F0A020);
-@danger: var(--danger, #D03050);
-@info: var(--info, #909399);
+// Primary — Indigo (both themes)
+@primary: var(--primary, #6366F1);
+@primary-light: var(--primary-light, #818CF8);
+@primary-dark: var(--primary-dark, #4F46E5);
+@accent: var(--accent, #8B5CF6);
+@accent-light: var(--accent-light, #A78BFA);
 
-// Background
-@bg-page: var(--bg-page, #F5F7FA);
-@bg-card: var(--bg-card, #FFFFFF);
-@bg-sidebar: var(--bg-sidebar, #1C2333);
-@bg-sidebar-hover: var(--bg-sidebar-hover, #2A3447);
-@bg-sidebar-active: @primary;
+@success: var(--success, #10B981);
+@warning: var(--warning, #F59E0B);
+@danger: var(--danger, #EF4444);
+@info: var(--info, #6B7280);
+
+// Backgrounds
+@bg-page: var(--bg-page, #0F1119);
+@bg-card: var(--bg-card, #1A1D27);
+@bg-card-raised: var(--bg-card-raised, #1F222D);
+@bg-sidebar: var(--bg-sidebar, #0B0D14);
+@bg-sidebar-hover: var(--bg-sidebar-hover, #1A1D28);
 
 // Text
-@text-primary: var(--text-primary, #1A1A2E);
-@text-regular: var(--text-regular, #4A5568);
-@text-secondary: var(--text-secondary, #718096);
-@text-placeholder: var(--text-placeholder, #A0AEC0);
+@text-primary: var(--text-primary, #F3F4F6);
+@text-regular: var(--text-regular, #D1D5DB);
+@text-secondary: var(--text-secondary, #9CA3AF);
+@text-placeholder: var(--text-placeholder, #6B7280);
 @text-white: var(--text-white, #FFFFFF);
 
 // Border
-@border-color: var(--border-color, #E2E8F0);
-@border-radius-sm: 4px;
-@border-radius: 8px;
-@border-radius-lg: 12px;
+@border-color: var(--border-color, #2D3148);
+@border-light: var(--border-light, rgba(255, 255, 255, 0.06));
+
+// Radius
+@border-radius-sm: 6px;
+@border-radius: 10px;
+@border-radius-lg: 14px;
+@border-radius-xl: 20px;
 
 // Shadow
-@shadow-sm: var(--shadow-sm, 0 1px 3px rgba(0, 0, 0, 0.08));
-@shadow: var(--shadow, 0 4px 12px rgba(0, 0, 0, 0.08));
-@shadow-lg: var(--shadow-lg, 0 8px 24px rgba(0, 0, 0, 0.12));
+@shadow-sm: var(--shadow-sm, 0 1px 2px rgba(0, 0, 0, 0.2));
+@shadow: var(--shadow, 0 2px 8px rgba(0, 0, 0, 0.3));
+@shadow-lg: var(--shadow-lg, 0 4px 16px rgba(0, 0, 0, 0.4));
 
 // Spacing
-@space-xs: 4px;
-@space-sm: 8px;
-@space-md: 16px;
-@space-lg: 24px;
-@space-xl: 32px;
+@space-xs: 6px;
+@space-sm: 10px;
+@space-md: 20px;
+@space-lg: 28px;
+@space-xl: 36px;
+@space-2xl: 48px;
 
 // Layout
-@sidebar-width: 240px;
-@sidebar-collapsed-width: 64px;
+@sidebar-width: 260px;
+@sidebar-collapsed-width: 68px;
 @navbar-height: 64px;
 
-// Typography — Inter optimized
-@font-size-xs: 12px;
-@font-size-sm: 13px;
-@font-size-base: 14px;
-@font-size-md: 16px;
-@font-size-lg: 18px;
-@font-size-xl: 26px;
+// Typography
+@font-sans: 'PingFang SC', 'Microsoft YaHei', 'Hiragino Sans GB', sans-serif;
+@font-size-xs: 13px;
+@font-size-sm: 14px;
+@font-size-base: 15px;
+@font-size-md: 17px;
+@font-size-lg: 19px;
+@font-size-xl: 24px;
+@font-size-display: 36px;
 @font-weight-normal: 400;
 @font-weight-medium: 500;
 @font-weight-semibold: 600;
 @font-weight-bold: 700;
 @font-weight-extrabold: 800;
 @line-height-tight: 1.25;
-@line-height-normal: 1.5;
+@line-height-normal: 1.6;
 
 // Transition
-@transition-base: all 0.2s ease;
-@transition-slow: all 0.3s ease;
+@transition-fast: all 0.15s ease;
+@transition-base: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+@transition-slow: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
