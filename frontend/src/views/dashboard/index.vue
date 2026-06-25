@@ -12,7 +12,7 @@
           <el-icon :size="22"><component :is="card.icon" /></el-icon>
         </div>
         <div class="stat-body">
-          <span class="stat-value">{{ card.animatedValue }}</span>
+          <span class="stat-value">{{ card.display }}</span>
           <span class="stat-label">{{ card.label }}</span>
         </div>
         <div class="stat-trend" :class="card.trend >= 0 ? 'up' : 'down'">
@@ -27,8 +27,8 @@
       <div class="chart-card">
         <div class="chart-header">
           <div>
-            <span class="chart-title">员工变动趋势</span>
-            <span class="chart-sub">近 6 个月入职 / 离职数据</span>
+            <span class="chart-title">营收趋势</span>
+            <span class="chart-sub">近 6 个月入账 / 已完成营收</span>
           </div>
           <span class="chart-period">2026</span>
         </div>
@@ -37,8 +37,8 @@
       <div class="chart-card">
         <div class="chart-header">
           <div>
-            <span class="chart-title">部门人员分布</span>
-            <span class="chart-sub">各部门在职员工占比</span>
+            <span class="chart-title">房型客房分布</span>
+            <span class="chart-sub">各房型客房数量占比</span>
           </div>
         </div>
         <div ref="pieChartRef" class="chart-body" />
@@ -48,15 +48,20 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted, onUnmounted, nextTick, watch } from 'vue'
+import { ref, reactive, onMounted, onUnmounted, nextTick, watch } from 'vue'
 import * as echarts from 'echarts'
 import { dashboardApi, type DashboardStats } from '@/api/dashboard'
-import { useCountUp } from '@/composables/useCountUp'
 import { useTheme } from '@/composables/useTheme'
 
 const loading = ref(true)
 const stats = reactive<DashboardStats>({
-  totalEmployees: 0, departmentCount: 0, monthlyHires: 0, inactiveCount: 0, turnoverRate: 0,
+  totalRooms: 0,
+  occupiedRooms: 0,
+  occupancyRate: 0,
+  todayCheckIns: 0,
+  todayRevenue: 0,
+  monthlyRevenue: [],
+  roomTypeDistribution: [],
 })
 
 const lineChartRef = ref<HTMLDivElement>()
@@ -65,126 +70,159 @@ let lineChart: echarts.ECharts | null = null
 let pieChart: echarts.ECharts | null = null
 
 const { isDark } = useTheme()
-const countUpTotal = useCountUp(1000)
-const countUpDept = useCountUp(800)
-const countUpEntry = useCountUp(900)
-const countUpRate = useCountUp(700)
 
 const statCards = ref([
   {
-    key: 'total', label: '员工总数', value: 0, trend: 5.2, icon: 'User',
-    color: '#6366F1', bg: 'rgba(99,102,241,0.1)',
-    animatedValue: computed(() => countUpTotal.display.value),
+    key: 'rate',
+    label: '今日入住率',
+    display: '0%',
+    trend: 5.2,
+    icon: 'PieChart',
+    color: '#6366F1',
+    bg: 'rgba(99,102,241,0.1)',
   },
   {
-    key: 'dept', label: '部门数量', value: 0, trend: 0, icon: 'OfficeBuilding',
-    color: '#8B5CF6', bg: 'rgba(139,92,246,0.1)',
-    animatedValue: computed(() => countUpDept.display.value),
+    key: 'occupied',
+    label: '在住客房',
+    display: '0',
+    trend: 0,
+    icon: 'House',
+    color: '#8B5CF6',
+    bg: 'rgba(139,92,246,0.1)',
   },
   {
-    key: 'entry', label: '本月入职', value: 0, trend: 50, icon: 'UserFilled',
-    color: '#10B981', bg: 'rgba(16,185,129,0.1)',
-    animatedValue: computed(() => countUpEntry.display.value),
+    key: 'today',
+    label: '今日入住',
+    display: '0',
+    trend: 50,
+    icon: 'UserFilled',
+    color: '#10B981',
+    bg: 'rgba(16,185,129,0.1)',
   },
   {
-    key: 'resign', label: '离职率', value: '0%', trend: -2, icon: 'TrendCharts',
-    color: '#F59E0B', bg: 'rgba(245,158,11,0.1)',
-    animatedValue: computed(() => countUpRate.display.value + '%'),
+    key: 'revenue',
+    label: '今日营收',
+    display: '¥0',
+    trend: -2,
+    icon: 'Wallet',
+    color: '#F59E0B',
+    bg: 'rgba(245,158,11,0.1)',
   },
 ])
 
-const months = ['1月', '2月', '3月', '4月', '5月', '6月']
-
 function theme() {
-  return isDark.value ? {
-    bg: '#1A1D27', border: '#373B50', text: '#F3F4F6', sub: '#9CA3AF',
-    grid: '#232738', axis: '#373B50', pieBorder: '#1A1D27',
-    hire: '#818CF8', hireArea: ['rgba(99,102,241,0.2)', 'rgba(99,102,241,0)'],
-    pie: ['#6366F1', '#8B5CF6', '#10B981', '#F59E0B'],
-  } : {
-    bg: '#FCFCFA', border: '#E5E3E0', text: '#1C1B1F', sub: '#5F5C63',
-    grid: '#EEEDE9', axis: '#E5E3E0', pieBorder: '#FCFCFA',
-    hire: '#4F46E5', hireArea: ['rgba(79,70,229,0.12)', 'rgba(79,70,229,0)'],
-    pie: ['#4F46E5', '#7C3AED', '#059669', '#D97706'],
-  }
+  return isDark.value
+    ? {
+        bg: '#1A1D27', border: '#373B50', text: '#F3F4F6', sub: '#9CA3AF',
+        grid: '#232738', axis: '#373B50', pieBorder: '#1A1D27',
+        income: '#818CF8', completed: '#34D399',
+        incomeArea: ['rgba(99,102,241,0.2)', 'rgba(99,102,241,0)'],
+        pie: ['#6366F1', '#8B5CF6', '#10B981', '#F59E0B', '#EC4899'],
+      }
+    : {
+        bg: '#FCFCFA', border: '#E5E3E0', text: '#1C1B1F', sub: '#5F5C63',
+        grid: '#EEEDE9', axis: '#E5E3E0', pieBorder: '#FCFCFA',
+        income: '#4F46E5', completed: '#059669',
+        incomeArea: ['rgba(79,70,229,0.12)', 'rgba(79,70,229,0)'],
+        pie: ['#4F46E5', '#7C3AED', '#059669', '#D97706', '#DB2777'],
+      }
 }
 
 function buildCharts() {
   const t = theme()
 
+  // 折线：6 个月营收
   if (lineChartRef.value) {
     lineChart?.dispose()
     lineChart = echarts.init(lineChartRef.value)
+    const months = stats.monthlyRevenue.map((m) => m.month.slice(5)) // 取 MM
+    const incomes = stats.monthlyRevenue.map((m) => m.income)
+    const completed = stats.monthlyRevenue.map((m) => m.completed)
     lineChart.setOption({
-      animationDuration: 1200, backgroundColor: t.bg,
+      animationDuration: 1200,
+      backgroundColor: t.bg,
       tooltip: {
         trigger: 'axis', backgroundColor: t.bg, borderColor: t.border,
         textStyle: { color: t.text, fontSize: 13 },
         axisPointer: { lineStyle: { color: t.grid } },
       },
-      legend: { data: ['入职', '离职'], bottom: 0, textStyle: { color: t.sub, fontSize: 12 } },
+      legend: { data: ['入账', '已完成'], bottom: 0, textStyle: { color: t.sub, fontSize: 12 } },
       grid: { left: 8, right: 12, bottom: 36, top: 8, containLabel: true },
       xAxis: { type: 'category', data: months, axisLine: { lineStyle: { color: t.axis } }, axisLabel: { color: t.sub, fontSize: 11 } },
       yAxis: { type: 'value', splitLine: { lineStyle: { color: t.grid } }, axisLabel: { color: t.sub, fontSize: 11 } },
       series: [
-        { name: '入职', type: 'line', smooth: true, data: [3, 5, 2, 6, 4, 3],
-          itemStyle: { color: t.hire }, lineStyle: { width: 3 },
+        {
+          name: '入账', type: 'line', smooth: true, data: incomes,
+          itemStyle: { color: t.income }, lineStyle: { width: 3 },
           symbol: 'circle', symbolSize: 6,
-          areaStyle: { color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-            { offset: 0, color: t.hireArea[0] }, { offset: 1, color: t.hireArea[1] }]) } },
-        { name: '离职', type: 'line', smooth: true, data: [1, 2, 1, 3, 1, 1],
-          itemStyle: { color: '#EF4444' }, lineStyle: { width: 2 },
+          areaStyle: {
+            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+              { offset: 0, color: t.incomeArea[0] },
+              { offset: 1, color: t.incomeArea[1] },
+            ]),
+          },
+        },
+        {
+          name: '已完成', type: 'line', smooth: true, data: completed,
+          itemStyle: { color: t.completed }, lineStyle: { width: 2 },
           symbol: 'circle', symbolSize: 4,
-          areaStyle: { color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-            { offset: 0, color: 'rgba(239,68,68,0.1)' }, { offset: 1, color: 'rgba(239,68,68,0)' }]) } },
+          areaStyle: {
+            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+              { offset: 0, color: 'rgba(16,185,129,0.1)' },
+              { offset: 1, color: 'rgba(16,185,129,0)' },
+            ]),
+          },
+        },
       ],
     })
   }
 
+  // 饼图：房型占比
   if (pieChartRef.value) {
     pieChart?.dispose()
     pieChart = echarts.init(pieChartRef.value)
+    const data = stats.roomTypeDistribution.map((d, i) => ({
+      value: d.value,
+      name: d.name,
+      itemStyle: { color: t.pie[i % t.pie.length] },
+    }))
     pieChart.setOption({
-      animationDuration: 1000, backgroundColor: t.bg,
-      tooltip: { trigger: 'item', formatter: '{b}: {c}人 ({d}%)', backgroundColor: t.bg, borderColor: t.border, textStyle: { color: t.text } },
+      animationDuration: 1000,
+      backgroundColor: t.bg,
+      tooltip: { trigger: 'item', formatter: '{b}: {c}间 ({d}%)', backgroundColor: t.bg, borderColor: t.border, textStyle: { color: t.text } },
       legend: { bottom: 0, textStyle: { fontSize: 12, color: t.sub } },
       series: [{
         type: 'pie', radius: ['48%', '76%'], center: ['50%', '44%'],
         itemStyle: { borderRadius: 8, borderColor: t.pieBorder, borderWidth: 3 },
         label: { show: false },
         emphasis: { label: { show: true, fontWeight: 'bold', fontSize: 14 } },
-        data: [
-          { value: 12, name: '技术部', itemStyle: { color: t.pie[0] } },
-          { value: 3, name: '产品部', itemStyle: { color: t.pie[1] } },
-          { value: 3, name: '市场部', itemStyle: { color: t.pie[2] } },
-          { value: 2, name: '人事部', itemStyle: { color: t.pie[3] } },
-        ],
+        data,
       }],
     })
   }
 }
 
-function handleResize() { lineChart?.resize(); pieChart?.resize() }
+function handleResize() {
+  lineChart?.resize()
+  pieChart?.resize()
+}
 
 async function fetchStats() {
   try {
     const data = await dashboardApi.getStats()
     Object.assign(stats, data)
-    statCards.value[0].value = data.totalEmployees
-    statCards.value[1].value = data.departmentCount
-    statCards.value[2].value = data.monthlyHires
-    statCards.value[3].value = data.turnoverRate + '%'
-    await nextTick()
-    countUpTotal.animate(data.totalEmployees)
-    countUpDept.animate(data.departmentCount)
-    countUpEntry.animate(data.monthlyHires)
-    countUpRate.animate(data.turnoverRate)
-  } finally { loading.value = false }
+    statCards.value[0].display = data.occupancyRate + '%'
+    statCards.value[1].display = String(data.occupiedRooms)
+    statCards.value[2].display = String(data.todayCheckIns)
+    statCards.value[3].display = '¥' + data.todayRevenue.toLocaleString()
+    nextTick(buildCharts)
+  } finally {
+    loading.value = false
+  }
 }
 
 onMounted(() => {
   fetchStats()
-  nextTick(buildCharts)
   window.addEventListener('resize', handleResize)
 })
 
@@ -192,7 +230,8 @@ watch(isDark, () => nextTick(buildCharts))
 
 onUnmounted(() => {
   window.removeEventListener('resize', handleResize)
-  lineChart?.dispose(); pieChart?.dispose()
+  lineChart?.dispose()
+  pieChart?.dispose()
 })
 </script>
 
@@ -277,14 +316,8 @@ onUnmounted(() => {
   border-radius: 8px;
   flex-shrink: 0;
 
-  &.up {
-    color: @success;
-    background: rgba(var(--success-rgb), 0.08);
-  }
-  &.down {
-    color: @danger;
-    background: rgba(var(--danger-rgb), 0.08);
-  }
+  &.up { color: @success; background: rgba(var(--success-rgb), 0.08); }
+  &.down { color: @danger; background: rgba(var(--danger-rgb), 0.08); }
 }
 
 // 图表
@@ -292,7 +325,6 @@ onUnmounted(() => {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: @space-lg;
-
   @media (max-width: 900px) { grid-template-columns: 1fr; }
 }
 
@@ -302,10 +334,7 @@ onUnmounted(() => {
   border-radius: @border-radius-xl;
   padding: @space-lg;
   transition: all 0.2s ease;
-
-  &:hover {
-    box-shadow: @shadow;
-  }
+  &:hover { box-shadow: @shadow; }
 }
 
 .chart-header {
@@ -338,7 +367,5 @@ onUnmounted(() => {
   border: 1px solid @border-color;
 }
 
-.chart-body {
-  height: 320px;
-}
+.chart-body { height: 320px; }
 </style>

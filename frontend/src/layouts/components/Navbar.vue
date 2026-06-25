@@ -49,7 +49,7 @@
           <el-dropdown-menu>
             <div class="dropdown-header">
               <span class="dropdown-name">{{ user?.username }}</span>
-              <span class="dropdown-email">admin@hr.com</span>
+              <span class="dropdown-email">admin@hotel.com</span>
             </div>
             <el-dropdown-item command="logout" :icon="SwitchButton" divided>退出登录</el-dropdown-item>
           </el-dropdown-menu>

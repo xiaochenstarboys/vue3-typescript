@@ -3,12 +3,12 @@
     <!-- Logo -->
     <div class="logo-area">
       <div class="logo-mark">
-        <el-icon :size="20"><OfficeBuilding /></el-icon>
+        <el-icon :size="20"><House /></el-icon>
       </div>
       <transition name="fade">
         <div v-if="!collapsed" class="logo-text">
-          <span class="logo-title">HR 管理系统</span>
-          <span class="logo-sub">人力管理平台</span>
+          <span class="logo-title">酒店管理系统</span>
+          <span class="logo-sub">智慧酒店管理平台</span>
         </div>
       </transition>
     </div>
@@ -73,9 +73,9 @@ const user = computed(() => store.state.auth.user)
 const activeMenu = computed(() => '/' + route.path.split('/')[1])
 
 const menuItems = [
-  { path: '/dashboard', title: '首页概览', icon: 'Odometer' },
-  { path: '/employee', title: '员工管理', icon: 'User' },
-  { path: '/department', title: '部门管理', icon: 'OfficeBuilding' },
+  { path: '/dashboard', title: '数据看板', icon: 'Odometer' },
+  { path: '/room', title: '房型与客房', icon: 'OfficeBuilding' },
+  { path: '/order', title: '订单与入住', icon: 'Tickets' },
 ]
 </script>
 

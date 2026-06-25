@@ -11,10 +11,10 @@
     <div class="login-card">
       <div class="card-header">
         <div class="logo-icon">
-          <el-icon :size="28"><OfficeBuilding /></el-icon>
+          <el-icon :size="28"><House /></el-icon>
         </div>
-        <h1 class="title">HR 管理系统</h1>
-        <p class="subtitle">企业人力资源管理平台</p>
+        <h1 class="title">酒店管理系统</h1>
+        <p class="subtitle">智慧酒店运营管理平台</p>
       </div>
 
       <el-form

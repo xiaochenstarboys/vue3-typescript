@@ -18,11 +18,14 @@ export interface PageResult<T> {
   pageSize: number
 }
 
+/** 订单分页查询参数 */
 export interface PageQuery {
   page: number
   pageSize: number
   keyword?: string
-  departmentId?: number
+  /** 按房型筛选（关联该房型的客房） */
+  roomTypeId?: number
+  /** 按订单状态筛选 */
   status?: string
 }
 

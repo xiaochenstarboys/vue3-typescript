@@ -15,6 +15,6 @@ export interface PageQuery {
   page: number
   pageSize: number
   keyword?: string
-  departmentId?: number
+  roomTypeId?: number
   status?: string
 }

@@ -1,7 +1,7 @@
 {
-  "name": "company-management-frontend",
+  "name": "hotel-management-frontend",
   "version": "1.0.0",
-  "description": "Company Management System Frontend - Vue3 + TypeScript + Vite + Element Plus",
+  "description": "Hotel Management System Frontend - Vue3 + TypeScript + Vite + Element Plus",
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc && vite build",
@@ -10,10 +10,10 @@
     "type-check": "vue-tsc --noEmit"
   },
   "dependencies": {
+    "@element-plus/icons-vue": "^2.3.1",
     "axios": "^1.7.2",
     "echarts": "^5.5.0",
     "element-plus": "^2.7.3",
-    "@element-plus/icons-vue": "^2.3.1",
     "vue": "^3.4.27",
     "vue-router": "^4.3.3",
     "vuex": "^4.1.0"
@@ -25,6 +25,7 @@
     "eslint": "^8.57.0",
     "eslint-plugin-vue": "^9.26.0",
     "less": "^4.2.0",
+    "playwright": "^1.61.1",
     "prettier": "^3.3.2",
     "typescript": "^5.4.5",
     "vite": "^5.3.1",

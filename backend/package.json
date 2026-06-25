@@ -1,7 +1,7 @@
 {
-  "name": "company-management-backend",
+  "name": "hotel-management-backend",
   "version": "1.0.0",
-  "description": "Company Management System Backend - Node.js + Express + TypeScript + MySQL",
+  "description": "Hotel Management System Backend - Node.js + Express + TypeScript + MySQL",
   "main": "dist/app.js",
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/app.ts",

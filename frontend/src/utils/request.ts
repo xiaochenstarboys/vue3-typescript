@@ -54,6 +54,10 @@ export async function put<T>(url: string, data?: unknown): Promise<T> {
   return instance.put<ApiResponse<T>>(url, data) as unknown as Promise<T>
 }
 
+export async function patch<T>(url: string, data?: unknown): Promise<T> {
+  return instance.patch<ApiResponse<T>>(url, data) as unknown as Promise<T>
+}
+
 export async function del<T>(url: string, data?: unknown): Promise<T> {
   return instance.delete<ApiResponse<T>>(url, { data }) as unknown as Promise<T>
 }

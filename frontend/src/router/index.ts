@@ -18,19 +18,19 @@ const routes: RouteRecordRaw[] = [
         path: 'dashboard',
         name: 'Dashboard',
         component: () => import('@/views/dashboard/index.vue'),
-        meta: { title: '首页概览', icon: 'Odometer' },
+        meta: { title: '数据看板', icon: 'Odometer' },
       },
       {
-        path: 'employee',
-        name: 'Employee',
-        component: () => import('@/views/employee/index.vue'),
-        meta: { title: '员工管理', icon: 'User' },
+        path: 'room',
+        name: 'Room',
+        component: () => import('@/views/room/index.vue'),
+        meta: { title: '房型与客房', icon: 'OfficeBuilding' },
       },
       {
-        path: 'department',
-        name: 'Department',
-        component: () => import('@/views/department/index.vue'),
-        meta: { title: '部门管理', icon: 'OfficeBuilding' },
+        path: 'order',
+        name: 'Order',
+        component: () => import('@/views/order/index.vue'),
+        meta: { title: '订单与入住', icon: 'Tickets' },
       },
     ],
   },
@@ -49,7 +49,7 @@ router.beforeEach((to, _from, next) => {
   } else if (to.path === '/login' && token) {
     next('/')
   } else {
-    document.title = to.meta.title ? `${to.meta.title} - HR 管理系统` : 'HR 管理系统'
+    document.title = to.meta.title ? `${to.meta.title} - 酒店管理系统` : '酒店管理系统'
     next()
   }
 })

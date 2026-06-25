@@ -4,8 +4,9 @@ import dotenv from 'dotenv'
 import { testConnection } from './config/db'
 import { errorHandler } from './middleware/errorHandler'
 import authRouter from './routes/auth'
-import employeesRouter from './routes/employees'
-import departmentsRouter from './routes/departments'
+import roomTypesRouter from './routes/roomTypes'
+import roomsRouter from './routes/rooms'
+import ordersRouter from './routes/orders'
 import dashboardRouter from './routes/dashboard'
 
 dotenv.config()
@@ -18,8 +19,9 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
 app.use('/api/auth', authRouter)
-app.use('/api/employees', employeesRouter)
-app.use('/api/departments', departmentsRouter)
+app.use('/api/room-types', roomTypesRouter)
+app.use('/api/rooms', roomsRouter)
+app.use('/api/orders', ordersRouter)
 app.use('/api/dashboard', dashboardRouter)
 
 app.get('/health', (_req, res) => res.json({ status: 'ok' }))

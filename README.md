@@ -1,106 +1,77 @@
-# 公司管理项目
+# 酒店管理系统 Hotel Management System
 
-> Vue 3 + TypeScript + Vite + Element Plus + Node.js Express + MySQL
+基于 **Vue 3 + TypeScript + Element Plus + ECharts** 前端，**Node.js + Express + TypeScript + MySQL** 后端的全栈酒店运营管理平台。支持房型与客房管理、房态看板、预订与入住全流程、入住率与营收数据看板。
 
-## 技术栈
+## ✨ 功能模块
 
-**前端**
-- Vue 3 + TypeScript (strict mode)
-- Vite 5
-- Element Plus + @element-plus/icons-vue
-- Vuex 4 (全模块类型化)
-- Vue Router 4
-- Axios (泛型封装)
-- Less + CSS Variables 主题
-- ECharts 数据可视化
+- **数据看板**：今日入住率、在住客房、今日入住、今日营收；近 6 个月入账/已完成营收趋势；各房型客房占比。
+- **房型与客房管理**：房型维护（房价/床型/面积/人数）；客房按房型网格化展示；房态（空闲/入住/脏房/维修）实时切换。
+- **订单与入住管理**：预订登记、办理入住、办理退房、取消；同房日期冲突校验；选房型联动可选房间 + 自动算价。
 
-**后端**
-- Node.js + Express + TypeScript
-- MySQL 8 + mysql2
-- JWT 认证
-- Zod 请求校验
-- bcryptjs 密码加密
+## 🏗 技术架构
 
----
+| 层 | 技术栈 |
+|---|---|
+| 前端 | Vue 3 + TypeScript + Vite + Element Plus + ECharts + Vuex + Less |
+| 后端 | Node.js + Express + TypeScript + MySQL + Zod + JWT + bcrypt |
 
-## 快速开始
+## 🚀 快速开始
 
-### 1. 数据库初始化
+### 1. 初始化数据库
 
 ```bash
 mysql -u root -p < backend/sql/init.sql
 ```
 
+> 脚本会创建 `hotel_system` 库并写入房型/客房/订单种子数据（日期相对 `CURDATE()` 动态生成，任意时间运行都有当日数据）。
+
 ### 2. 启动后端
 
 ```bash
 cd backend
-cp .env.example .env     # 填写数据库配置
 npm install
-npm run dev              # http://localhost:3000
+npm run dev          # http://localhost:3000
 ```
+
+配置见 `backend/.env`（默认 `DB_NAME=hotel_system`，密码按本地修改）。
 
 ### 3. 启动前端
 
 ```bash
 cd frontend
 npm install
-npm run dev              # http://localhost:5173
+npm run dev          # http://localhost:5173
 ```
 
 ### 4. 登录
 
 | 账号 | 密码 | 角色 |
-|------|------|------|
+|---|---|---|
 | admin | password | 管理员 |
 | manager | password | 经理 |
 
----
+## 🔑 业务亮点
 
-## 项目结构
+- **订单日期冲突校验**：同一客房在入住区间内不允许重叠预订，后端 SQL 区间相交校验。
+- **入住/退房联动房态**：办理入住房间自动置「入住」；退房自动置「脏房」待保洁；取消已入住订单释放房间为「脏房」。
+- **双主题设计系统**：暗色 Indigo + 浅色 Warm Stone，看板图表随主题重绘。
+
+## 📁 目录结构
 
 ```
-├── frontend/
-│   └── src/
-│       ├── api/          # 接口层（全类型化）
-│       ├── composables/  # useEmployee / useDepartment / useTheme
-│       ├── layouts/      # DefaultLayout + Sidebar + Navbar
-│       ├── router/       # 路由守卫 + typed meta
-│       ├── store/        # Vuex 模块（auth / employee / department）
-│       ├── styles/       # Less 变量 + 全局样式
-│       ├── types/        # 全局 TS 接口定义
-│       └── views/        # login / dashboard / employee / department
-└── backend/
-    └── src/
-        ├── config/       # MySQL 连接池
-        ├── middleware/   # JWT 验证 + 错误处理
-        ├── routes/       # auth / employees / departments
-        └── types/        # 共享类型
+├─ backend/
+│  ├─ src/
+│  │  ├─ routes/        # auth / roomTypes / rooms / orders / dashboard
+│  │  ├─ config/        # db 连接池
+│  │  ├─ middleware/    # auth / asyncHandler / errorHandler
+│  │  └─ utils/         # toCamelCase
+│  └─ sql/init.sql      # 建表 + 种子数据
+└─ frontend/
+   └─ src/
+      ├─ views/         # dashboard / room / order / login
+      ├─ components/    # StatusBadge / UserAvatar / PageContainer
+      ├─ composables/   # useRoom / useOrder / useTheme / useCountUp
+      ├─ api/           # room / order / dashboard / auth
+      ├─ types/         # room / order / api / router
+      └─ styles/        # variables / theme / global
 ```
-
----
-
-## 核心功能
-
-- **员工管理**：列表分页/筛选、新增、编辑（侧滑抽屉）、删除、批量删除
-- **部门管理**：树形结构展示、左树右表联动、增删改
-- **Dashboard**：数据统计卡片 + ECharts 折线图 + 饼图
-- **认证**：JWT 登录、路由守卫、自动跳转
-- **UI**：亮/暗主题切换、响应式布局、骨架屏、过渡动画
-
----
-
-## API 接口
-
-| 方法 | 路径 | 说明 |
-|------|------|------|
-| POST | /api/auth/login | 登录 |
-| GET | /api/employees | 分页查询员工 |
-| POST | /api/employees | 新增员工 |
-| PUT | /api/employees/:id | 编辑员工 |
-| DELETE | /api/employees/:id | 删除员工 |
-| DELETE | /api/employees | 批量删除 |
-| GET | /api/departments | 获取部门树 |
-| POST | /api/departments | 新增部门 |
-| PUT | /api/departments/:id | 编辑部门 |
-| DELETE | /api/departments/:id | 删除部门 |
